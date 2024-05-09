@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KATA</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            font-size: 1.7rem; /* Aumentando a fonte em 70% */
+            position: relative; /* Definir como relativo para a imagem como marca d'água */
+        }
+        .container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        h1 {
+            font-size: 2.64rem; /* Aumentando a fonte do título em 30% */
+            margin: 0;
+            color: #333;
+        }
+        .nota-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .nota {
+            margin: 10px;
+            font-weight: bold;
+            text-align: center;
+            width: 100px;
+        }
+        .notaInput {
+            width: 80px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid black;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: inherit; /* Herdando o tamanho de fonte do pai */
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .notaInput:focus {
+            border-color: #007bff;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: red;
+        }
+        #notaFinal {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 3.0rem; /* Aumentando a fonte em 70% */
+            color: #333;
+            visibility: hidden; /* Ocultar inicialmente */
+        }
+        .blink {
+            animation: blink-animation 1s steps(5, start) infinite;
+        }
+        @keyframes blink-animation {
+            to {
+                visibility: hidden;
+            }
+        }
+        .highlight {
+            animation: highlight-animation 1s alternate infinite;
+        }
+        @keyframes highlight-animation {
+            from {
+                color: yellow;
+            }
+            to {
+                color: red;
+            }
+        }
+        #limparButton {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 7px 14px; /* Reduzindo em 60% */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: inherit; /* Herdando o tamanho de fonte do pai */
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            visibility: hidden; /* Ocultar inicialmente */
+        }
+        #limparButton:hover {
+            background-color: #c82333;
+        }
+        #limparButton span {
+            font-size: 2.0rem; /* Aumentando o tamanho do ícone em 70% */
+            margin-left: 5px;
+        }
+        /* Novo CSS para as caixas de texto */
+        .caixa-texto {
+            width: calc(100% - 40px); /* Largura ajustada para acomodar o padding da container */
+            height: 50px;
+            font-size: 1.7rem;
+            color: black;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center; /* Centralizar texto */
+            font-weight: bold; /* Texto em negrito */
+            box-sizing: border-box; /* Inclui padding e borda na largura */
+        }
+        .caixa-texto:last-child {
+            margin-bottom: 0;
+        }
+        /* Estilo para a imagem marca d'água */
+        #marcaAgua {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.2; /* Opacidade para torná-la semitransparente */
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Imagem de marca d'água -->
+    <img id="marcaAgua" src="img/UPAKI.jpg" alt="Marca d'água">
+
+    <input type="text" class="caixa-texto" placeholder="Digite aqui (Superior)">
+    <div class="container">
+        <h1>NOTAS:</h1>
+        <div class="nota-container">
+            <div class="nota">
+                <input type="text" class="notaInput" maxlength="5" oninput="autoTab(this, event)">
+            </div>
+            <div class="nota">
+                <input type="text" class="notaInput" maxlength="5" oninput="autoTab(this, event)">
+            </div>
+            <div class="nota">
+                <input type="text" class="notaInput" maxlength="5" oninput="autoTab(this, event)">
+            </div>
+            <div class="nota">
+                <input type="text" class="notaInput" maxlength="5" oninput="autoTab(this, event)">
+            </div>
+            <div class="nota">
+                <input type="text" class="notaInput" maxlength="5" oninput="autoTab(this, event)" onkeydown="handleKeyDown(event)">
+            </div>
+        </div>
+        <div id="notaFinal">Nota Final:<br><span id="somaNotaFinal" class="blink highlight">0,00</span></div>
+        <button id="limparButton" onclick="limparNotas()">Limpar <span>&#128465;</span></button>
+    </div>
+    <input type="text" class="caixa-texto" placeholder="Digite aqui (Inferior)">
+    
+    <!-- Botão Voltar -->
+    <button onclick="window.location.href='index.html'" style="position: absolute; top: 10px; left: 10px;">Voltar</button>
+
+
+    <script>
+        function autoTab(currentInput, event) {
+            const maxLength = parseInt(currentInput.getAttribute('maxlength'));
+            let value = currentInput.value.replace(/[^\d]/g, '');
+            if (value.length > 1) {
+                value = value.substring(0, 1) + ',' + value.substring(1, 3);
+            }
+            currentInput.value = value;
+            if (value.length >= maxLength) {
+                const nextInput = currentInput.parentElement.nextElementSibling.querySelector('.notaInput');
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        }
+
+        function updateStrikethrough() {
+            const inputs = document.querySelectorAll('.notaInput');
+            let max = -Infinity;
+            let min = Infinity;
+            let maxIndex = [];
+            let minIndex = [];
+            
+            // Encontra o valor máximo e mínimo e suas respectivas caixas de entrada
+            inputs.forEach((input, index) => {
+                const value = parseFloat(input.value.replace(',', '.'));
+                if (!isNaN(value)) {
+                    if (value > max) {
+                        max = value;
+                        maxIndex = [index];
+                    } else if (value === max) {
+                        maxIndex.push(index);
+                    }
+                    if (value < min) {
+                        min = value;
+                        minIndex = [index];
+                    } else if (value === min) {
+                        minIndex.push(index);
+                    }
+                }
+            });
+            
+            // Remove a classe strikethrough de todas as caixas de entrada
+            inputs.forEach(input => {
+                input.classList.remove('strikethrough');
+            });
+            
+            // Adiciona a classe strikethrough apenas para uma caixa de entrada da maior e menor nota
+            if (maxIndex.length > 0) {
+                inputs[maxIndex[0]].classList.add('strikethrough');
+            }
+            if (minIndex.length > 0) {
+                inputs[minIndex[0]].classList.add('strikethrough');
+            }
+
+            // Se todas as notas forem iguais, riscar duas notas
+            if (maxIndex.length === inputs.length && minIndex.length === inputs.length) {
+                inputs[maxIndex[1]].classList.add('strikethrough');
+                inputs[minIndex[1]].classList.add('strikethrough');
+            }
+        }
+
+        function updateNotaFinal() {
+            const inputs = document.querySelectorAll('.notaInput');
+            let sum = 0;
+            let count = 0;
+            let max = -Infinity;
+            let min = Infinity;
+            inputs.forEach(input => {
+                const value = parseFloat(input.value.replace(',', '.'));
+                if (!isNaN(value)) {
+                    sum += value;
+                    count++;
+                    max = Math.max(max, value);
+                    min = Math.min(min, value);
+                }
+            });
+            if (count === inputs.length) {
+                sum = sum - max - min;
+                const notaFinalElement = document.getElementById('somaNotaFinal');
+                notaFinalElement.textContent = sum.toFixed(2);
+                notaFinalElement.classList.add('blink', 'highlight');
+                setTimeout(() => {
+                    notaFinalElement.classList.remove('blink', 'highlight');
+                    document.getElementById('limparButton').style.visibility = 'visible'; // Exibir o botão "Limpar" após 4 segundos
+                }, 4000);
+                document.getElementById('notaFinal').style.visibility = 'visible'; // Exibir a nota final após o cálculo
+            }
+        }
+
+        function limparNotas() {
+            const inputs = document.querySelectorAll('.notaInput');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('strikethrough');
+            });
+            const notaFinalElement = document.getElementById('somaNotaFinal');
+            notaFinalElement.textContent = '0,00';
+            notaFinalElement.classList.remove('blink', 'highlight');
+            document.getElementById('notaFinal').style.visibility = 'hidden'; // Ocultar a nota final ao limpar as notas
+            document.getElementById('limparButton').style.visibility = 'hidden'; // Ocultar o botão "Limpar"
+        }
+
+        function handleKeyDown(event) {
+            if (event.keyCode === 13) {
+                updateStrikethrough();
+                updateNotaFinal();
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space') {
+                const currentInput = document.activeElement;
+                const nextInput = currentInput.parentElement.nextElementSibling.querySelector('.notaInput');
+                if (nextInput) {
+                    event.preventDefault(); // Evita o comportamento padrão da tecla espaço (scroll)
+                    nextInput.focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

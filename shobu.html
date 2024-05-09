@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placar de Karate</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            position: relative; /* Para posicionar a marca d'água */
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.2; /* Opacidade da marca d'água */
+            pointer-events: none; /* Para evitar que a marca d'água interfira com os elementos da página */
+            z-index: -1; /* Para garantir que a marca d'água fique atrás dos outros elementos */
+            
+        }
+
+        .input-box {
+            position: fixed;
+            width: 100%;
+            background-color: #f0f0f0;
+            color: black;
+            text-align: center;
+            font-size: 50px; /* Tamanho da fonte */
+            font-weight: bold;
+            padding: 10px;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .input-box:focus {
+            background-color: #f0f0f0;
+        }
+
+        #container {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-panel {
+            width: 33.333%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 55%;
+        }
+
+        .score-label {
+            font-size: 45px; /* Tamanho da fonte */
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .score {
+            font-size: 79px; /* Tamanho da fonte */
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .score-button {
+            font-size: 21.6px;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .score-button:hover {
+            background-color: #ccc;
+        }
+
+        #aka-panel, #shiro-panel {
+            width: 242px; /* Largura da janela lateral */
+            height: 242px; /* Altura da janela lateral */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 9px solid black; /* Adiciona borda preta */
+        }
+
+        #aka-panel {
+            background-color: #ff3333;
+            color: white;
+        }
+
+        #shiro-panel {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        #reset-button {
+            font-size: 16px;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #ffffff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #reset-button:hover {
+            background-color: #ccc;
+        }
+
+        .timer {
+            font-size: 64px;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        #timer-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-button {
+            font-size: 36px;
+            padding: 0px 0px;
+            border: none;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+
+        .timer-button:hover {
+            background-color: #ccc;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .winner-message {
+            font-size: 60px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: rgb(4, 16, 87); /* Cor do texto */
+            animation: blink 1s infinite; /* Aplica a animação de piscar */
+        }
+
+        /* Estilos para as janelas */
+        .left-window, .right-window {
+            display: flex;
+            flex-direction: column; /* Alterado para disposição vertical */
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 200px;
+            width: 90px; /* Largura ajustada */
+            height: auto;
+            background-color: rgba(0, 0, 0, 0.2); /* Cor de fundo com transparência */
+            overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
+        }
+        .left-window {
+            left: 0;
+            background-color: #ff3333;
+            border:solid #000000;
+        }
+
+        .right-window {
+            right: 0;
+            background-color: white;
+            border:solid #000000;
+        }
+
+        /* Estilos para a caixa de texto */
+        .left-window .text-box {
+            width: 80%; /* Largura da caixa de texto */
+            font-size: 24px; /* Tamanho da fonte */
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #ff3333; /* Cor de fundo da caixa de texto na janela esquerda */
+            color: white; /* Cor do texto */
+            border: 1px solid #000000;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .right-window .text-box {
+            width: 80%; /* Largura da caixa de texto */
+            font-size: 24px; /* Tamanho da fonte */
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: white; /* Cor de fundo da caixa de texto na janela direita */
+            color: black; /* Cor do texto */
+            border: 1px solid #000000;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Estilos para o botão "Voltar" */
+        #back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999; /* Garante que o botão "Voltar" esteja acima de outros elementos */
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #back-button:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Botão para voltar -->
+<button id="back-button">
+    <a href="index.html" target="_self" style="text-decoration: none; color: inherit;">Voltar</a>
+</button>
+
+<!-- Janela no canto esquerdo -->
+<div class="left-window">
+    <!-- Caixa de texto -->
+    <textarea class="text-box" rows="6" placeholder=""></textarea>
+</div>
+
+<!-- Janela no canto direito -->
+<div class="right-window">
+    <!-- Caixa de texto -->
+    <textarea class="text-box" rows="6" placeholder=""></textarea>
+</div>
+
+<!-- Marca d'água -->
+<div class="watermark">
+    <img src="img/UPAKI.jpg" alt="Marca d'água">
+</div>
+
+<input type="text" class="input-box" style="top: 0;" placeholder="Digite algo aqui">
+
+<div id="container">
+    <div id="aka-panel" class="score-panel">
+        <div class="score-label">AKA</div>
+        <div class="score">0</div>
+        <button class="score-button" id="aka-plus">+</button>
+        <button class="score-button" id="aka-minus">-</button>
+    </div>
+
+    <div id="timer-panel">
+        <div id="timer" class="timer">00:00</div>
+        <div id="timer-controls">
+            <button class="timer-button" id="start-pause-button">&#9658;</button>
+            <button class="timer-button" id="define-time-button">&#8984;</button>
+        </div>
+        <div class="winner-message" id="winner-message"></div>
+    </div>
+
+    <div id="shiro-panel" class="score-panel">
+        <div class="score-label">SHIRO</div>
+        <div class="score">0</div>
+        <button class="score-button" id="shiro-plus">+</button>
+        <button class="score-button" id="shiro-minus">-</button>
+    </div>
+</div>
+
+<input type="text" class="input-box" style="bottom: 0;" placeholder="Digite algo aqui">
+
+<button id="reset-button">&#8634;</button>
+
+<!-- Aqui é onde você deve adicionar o elemento de áudio -->
+<audio id="countdown-audio">
+  <source src="audio/meu_audio.mp3.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+    const akaScoreDisplay = document.querySelector('#aka-panel .score');
+    const shiroScoreDisplay = document.querySelector('#shiro-panel .score');
+    const akaPlusButton = document.getElementById('aka-plus');
+    const akaMinusButton = document.getElementById('aka-minus');
+    const shiroPlusButton = document.getElementById('shiro-plus');
+    const shiroMinusButton = document.getElementById('shiro-minus');
+    const resetButton = document.getElementById('reset-button');
+    const timerDisplay = document.getElementById('timer');
+    const startPauseButton = document.getElementById('start-pause-button');
+    const defineTimeButton = document.getElementById('define-time-button');
+    const winnerMessage = document.getElementById('winner-message');
+
+    let akaScore = 0;
+    let shiroScore = 0;
+    let timerInterval;
+    let totalTimeInSeconds = 0;
+    let timeLeftInSeconds = 0;
+    let isTimerRunning = false;
+
+    akaPlusButton.addEventListener('click', () => {
+        akaScore++;
+        checkWinner();
+        updateScores();
+    });
+
+    akaMinusButton.addEventListener('click', () => {
+        if (akaScore > 0) {
+            akaScore--;
+            updateScores();
+        }
+    });
+
+    shiroPlusButton.addEventListener('click', () => {
+        shiroScore++;
+        checkWinner();
+        updateScores();
+    });
+
+    shiroMinusButton.addEventListener('click', () => {
+        if (shiroScore > 0) {
+            shiroScore--;
+            updateScores();
+        }
+    });
+
+    resetButton.addEventListener('click', () => {
+        akaScore = 0;
+        shiroScore = 0;
+        updateScores();
+    });
+
+    startPauseButton.addEventListener('click', () => {
+        if (isTimerRunning) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
+    });
+
+    defineTimeButton.addEventListener('click', () => {
+        const userInput = prompt("Digite o tempo em segundos:");
+        const timeInSeconds = parseInt(userInput, 10);
+        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+            totalTimeInSeconds = timeInSeconds;
+            timeLeftInSeconds = totalTimeInSeconds;
+            updateTimerDisplay();
+        }
+    });
+
+    function updateScores() {
+        akaScoreDisplay.textContent = akaScore;
+        shiroScoreDisplay.textContent = shiroScore;
+    }
+
+    function startTimer() {
+        if (!isTimerRunning) {
+            isTimerRunning = true;
+            winnerMessage.textContent = ''; // Limpa a mensagem do vencedor ao iniciar a contagem
+            timerInterval = setInterval(() => {
+                timeLeftInSeconds--;
+                if (timeLeftInSeconds >= 0) {
+                    updateTimerDisplay();
+                } else {
+                    pauseTimer();
+                    announceWinner(); // Mostra o vencedor quando o tempo acabar
+                }
+            }, 1000);
+            startPauseButton.textContent = '||';
+        }
+    }
+
+    function pauseTimer() {
+        if (isTimerRunning) {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            startPauseButton.textContent = '►';
+        }
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeftInSeconds / 60);
+        const seconds = timeLeftInSeconds % 60;
+        const formattedTime = `${padZero(minutes)}:${padZero(seconds)}`;
+        timerDisplay.textContent = formattedTime;
+
+        // Verificar se restam menos de 30 segundos e alterar a cor do contador
+        if (timeLeftInSeconds <= 30) {
+            timerDisplay.style.color = 'red';
+        } else {
+            timerDisplay.style.color = 'black';
+        }
+    }
+
+    function padZero(num) {
+        return (num < 10 ? '0' : '') + num;
+    }
+
+    function announceWinner() {
+        if (akaScore > shiroScore) {
+            winnerMessage.textContent = "Vencedor: AKA";
+        } else if (shiroScore > akaScore) {
+            winnerMessage.textContent = "Vencedor: SHIRO";
+        } else {
+            winnerMessage.textContent = "Empate";
+        }
+        // Adiciona a reprodução do som ao final da função
+        document.getElementById('countdown-audio').play();
+    }
+
+    function checkWinner() {
+        if (akaScore >= 30 || shiroScore >= 30) {
+            pauseTimer();
+            announceWinner();
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+header {
+    
+   padding: 10px 10%;
+
+}
+header > .interface {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+header a {
+   color: white ;
+   text-decoration: none;
+   display: inline-block;
+
+}
+header a:hover {
+    color: white;
+    transform: scale(1.5) ;
+    transition: .4s;
+    
+}
+.btn-contato button:hover{
+   box-shadow: 0px 0px 8px  red;;
+   transform: scale(1.05);
+}
+
+header nav ul {
+   list-style-type: none;
+}
+header nav ul li {
+   display: inline-block;
+   padding: 0 40px;
+}
+
+header img {
+   border: 0;
+   border-radius: 50%;
+   width: 100px;
+   height: 100px;
+   border: 1px solid rgb(7, 7, 88);
+}
+/* topo do site */
+section .toposite {
+   padding: 60px 8%;
+   
+}
+section.toposite .flex {
+   align-items: center;
+   justify-content: center;
+   gap: 90px;
+}
+.toposite .texttopsite {
+   h1 {
+       font-size: 40px;
+       line-height: 35px;
+   }
+}
+.toposite .texttopsite p {
+   margin: 40px 0;
+}
+.toposite p{
+   font-size: 20px;
+   line-height: 20px;
+}
+.toposite .imgtoposite img {
+   width: auto;
+   height: 400px;
+   padding: 20px 170px;
+   position: relative;
+   animation: pulapula 2s ease-in-out infinite alternate;
+}
+@keyframes pulapula{
+    0% {
+        top: 0;
+    }
+    100% {
+        top: 70px;
+    }
+}
+
+body{
+   background-color:black;
+   
+}
